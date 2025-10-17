@@ -2,6 +2,12 @@
 
 A high-performance packet duplication system using eBPF TC (Traffic Control) hooks with `bpf_clone_redirect()` to duplicate network packets across multiple containers in a Docker network.
 
+## 🚀 Quick Start
+
+**New to the project?** See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide.
+
+**Ready to contribute?** See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
 ## Overview
 
 This project demonstrates a complete eBPF-based packet duplication solution that:
@@ -73,9 +79,26 @@ This project demonstrates a complete eBPF-based packet duplication solution that
 - Docker and Docker Compose
 - Root/sudo privileges (for loading eBPF programs)
 
+**Check your system:**
+```bash
+./scripts/validate.sh
+```
+
 ## Quick Start
 
-### 1. Setup Environment
+### 1. Validate Environment
+
+```bash
+./scripts/validate.sh
+```
+
+### 2. Build the System
+
+```bash
+make
+```
+
+### 3. Setup Test Environment
 
 ```bash
 ./scripts/setup.sh
@@ -87,7 +110,7 @@ This will:
 - Start Docker containers
 - Create the test network
 
-### 2. Load eBPF Program
+### 4. Load eBPF Program
 
 Find the network interface indices:
 
@@ -107,7 +130,7 @@ Example:
 sudo ./loader -iface veth1234abc -targets veth5678def,veth90abghi,vethjklm123
 ```
 
-### 3. Test Packet Duplication
+### 5. Test Packet Duplication
 
 In another terminal, run the test script:
 
@@ -115,19 +138,19 @@ In another terminal, run the test script:
 ./scripts/test.sh
 ```
 
-### 4. View Statistics
+### 6. View Statistics
 
 ```bash
 sudo ./loader -stats
 ```
 
-### 5. Monitor eBPF Logs
+### 7. Monitor eBPF Logs
 
 ```bash
 sudo ./scripts/view_logs.sh
 ```
 
-### 6. Cleanup
+### 8. Cleanup
 
 ```bash
 ./scripts/cleanup.sh
