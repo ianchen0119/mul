@@ -6,6 +6,11 @@ A high-performance packet duplication system using eBPF TC (Traffic Control) hoo
 
 **New to the project?** See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide.
 
+**Want to see it in action?** Run the demo:
+```bash
+sudo ./scripts/demo.sh
+```
+
 **Ready to contribute?** See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Overview
