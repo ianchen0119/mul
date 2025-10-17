@@ -1,0 +1,40 @@
+# Compiled eBPF programs
+*.o
+
+# Go binaries
+loader
+cmd/loader/loader
+
+# Go build cache
+go.sum
+
+# Temporary files
+*.log
+*.tmp
+/tmp/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Docker volumes
+.docker/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.a
+*.so
+*.dylib
+*.exe
+*.test
+*.prof
+
+# Dependencies
+vendor/
+node_modules/
