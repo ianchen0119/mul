@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # Container running the eBPF program loader
+  ebpf-loader:
+    build:
+      context: .
+      dockerfile: Dockerfile.loader
+    container_name: ebpf-loader
+    privileged: true
+    network_mode: host
+    volumes:
+      - /sys/kernel/debug:/sys/kernel/debug
+      - ./src:/app/src
+      - ./cmd:/app/cmd
+    command: sleep infinity
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - BPF
+
+  # Container 1 - Packet sender
+  sender:
+    image: nicolaka/netshoot:latest
+    container_name: sender
+    networks:
+      - sender_net
+    command: sleep infinity
+    cap_add:
+      - NET_ADMIN
+
+  # Container 2 - Receiver 1
+  receiver1:
+    image: nicolaka/netshoot:latest
+    container_name: receiver1
+    networks:
+      - receiver_net
+    command: sleep infinity
+
+  # Container 3 - Receiver 2
+  receiver2:
+    image: nicolaka/netshoot:latest
+    container_name: receiver2
+    networks:
+      - receiver_net
+    command: sleep infinity
+
+  # Container 4 - Receiver 3
+  receiver3:
+    image: nicolaka/netshoot:latest
+    container_name: receiver3
+    networks:
+      - receiver_net
+    command: sleep infinity
+
+networks:
+  # Sender network - isolated network for the packet sender
+  sender_net:
+    driver: bridge
+    name: sender_net
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+  # Receiver network - isolated network for packet receivers
+  # This demonstrates cross-network packet duplication via eBPF
+  receiver_net:
+    driver: bridge
+    name: receiver_net
+    ipam:
+      config:
+        - subnet: 172.26.0.0/24
