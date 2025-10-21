@@ -41,7 +41,11 @@ docker-compose ps
 
 echo ""
 echo "Network Information:"
-docker network inspect ebpf_net --format '{{range .Containers}}{{.Name}}: {{.IPv4Address}}{{println}}{{end}}'
+echo "Sender Network:"
+docker network inspect sender_net --format '{{range .Containers}}{{.Name}}: {{.IPv4Address}}{{println}}{{end}}'
+echo ""
+echo "Receiver Network:"
+docker network inspect receiver_net --format '{{range .Containers}}{{.Name}}: {{.IPv4Address}}{{println}}{{end}}'
 
 echo ""
 echo "=== Setup Complete ==="

@@ -130,10 +130,11 @@ You should see 5 containers running:
 ### Inspect Network
 
 ```bash
-docker network inspect ebpf_net
+docker network inspect sender_net
+docker network inspect receiver_net
 ```
 
-This shows the network configuration and IP addresses assigned to each container.
+This shows the network configuration and IP addresses assigned to each container. Note that sender is on a separate network (172.25.0.0/24) from the receivers (172.26.0.0/24), demonstrating cross-network packet duplication.
 
 ## Step 5: Find Network Interfaces
 
@@ -439,12 +440,18 @@ sudo ./loader ...  # Must run as root
 Edit `compose.yaml` to customize:
 ```yaml
 networks:
-  ebpf_net:
+  sender_net:
     driver_opts:
       com.docker.network.driver.mtu: 9000  # Jumbo frames
     ipam:
       config:
-        - subnet: 10.100.0.0/16  # Custom subnet
+        - subnet: 10.100.0.0/24  # Custom subnet
+  receiver_net:
+    driver_opts:
+      com.docker.network.driver.mtu: 9000
+    ipam:
+      config:
+        - subnet: 10.101.0.0/24
 ```
 
 ### Filtering Packets

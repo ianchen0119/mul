@@ -257,7 +257,10 @@ ethtool -K <interface> gso on
 ```yaml
 # In compose.yaml, adjust MTU for jumbo frames
 networks:
-  ebpf_net:
+  sender_net:
+    driver_opts:
+      com.docker.network.driver.mtu: 9000
+  receiver_net:
     driver_opts:
       com.docker.network.driver.mtu: 9000
 ```

@@ -33,24 +33,31 @@ This project demonstrates a complete eBPF-based packet duplication solution that
 ## Architecture
 
 ```
-┌─────────────────┐
-│   Container A   │
-│    (Sender)     │
-└────────┬────────┘
-         │
-         ▼
-   ┌──────────┐
+Sender Network (172.25.0.0/24)        Receiver Network (172.26.0.0/24)
+┌─────────────────┐                   
+│   Container A   │                   
+│    (Sender)     │                   
+└────────┬────────┘                   
+         │                            
+         ▼                            
+   ┌──────────┐                       
    │ TC Egress│◄──── eBPF Program (bpf_clone_redirect)
-   │  Hook    │
-   └─────┬────┘
-         │
-    ┌────┴────┬─────────┬─────────┐
-    ▼         ▼         ▼         ▼
-┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-│  Orig  │ │  Copy  │ │  Copy  │ │  Copy  │
-│  Dest  │ │   #1   │ │   #2   │ │   #3   │
-└────────┘ └────────┘ └────────┘ └────────┘
+   │  Hook    │      on Host (bridges networks)
+   └─────┬────┘                       
+         │                            
+    ┌────┴────┬─────────┬─────────┐  
+    ▼         ▼         ▼         ▼  
+            ┌────────┐ ┌────────┐ ┌────────┐
+            │ Recv 1 │ │ Recv 2 │ │ Recv 3 │
+            │        │ │        │ │        │
+            └────────┘ └────────┘ └────────┘
 ```
+
+The system demonstrates cross-network packet duplication:
+- Sender runs on `sender_net` (172.25.0.0/24)
+- Receivers run on `receiver_net` (172.26.0.0/24)
+- eBPF loader runs in host network mode, bridging both networks
+- Packets from sender are cloned and redirected across network boundaries
 
 ## Project Structure
 
@@ -113,15 +120,16 @@ This will:
 - Build the eBPF program
 - Build the Go loader application
 - Start Docker containers
-- Create the test network
+- Create two test networks (sender_net and receiver_net)
 
 ### 4. Load eBPF Program
 
 Find the network interface indices:
 
 ```bash
-# Get interface information
-docker network inspect ebpf_net
+# Get interface information for both networks
+docker network inspect sender_net
+docker network inspect receiver_net
 ```
 
 Load the eBPF program (as root):

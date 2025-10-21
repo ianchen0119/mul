@@ -24,7 +24,7 @@ services:
     image: nicolaka/netshoot:latest
     container_name: sender
     networks:
-      - ebpf_net
+      - sender_net
     command: sleep infinity
     cap_add:
       - NET_ADMIN
@@ -34,7 +34,7 @@ services:
     image: nicolaka/netshoot:latest
     container_name: receiver1
     networks:
-      - ebpf_net
+      - receiver_net
     command: sleep infinity
 
   # Container 3 - Receiver 2
@@ -42,7 +42,7 @@ services:
     image: nicolaka/netshoot:latest
     container_name: receiver2
     networks:
-      - ebpf_net
+      - receiver_net
     command: sleep infinity
 
   # Container 4 - Receiver 3
@@ -50,13 +50,22 @@ services:
     image: nicolaka/netshoot:latest
     container_name: receiver3
     networks:
-      - ebpf_net
+      - receiver_net
     command: sleep infinity
 
 networks:
-  ebpf_net:
+  # Sender network - isolated network for the packet sender
+  sender_net:
     driver: bridge
-    name: ebpf_net
+    name: sender_net
     ipam:
       config:
-        - subnet: 172.25.0.0/16
+        - subnet: 172.25.0.0/24
+  # Receiver network - isolated network for packet receivers
+  # This demonstrates cross-network packet duplication via eBPF
+  receiver_net:
+    driver: bridge
+    name: receiver_net
+    ipam:
+      config:
+        - subnet: 172.26.0.0/24

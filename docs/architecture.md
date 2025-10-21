@@ -43,11 +43,11 @@ The user-space Go application:
 **File**: `compose.yaml`
 
 Multi-container environment for testing:
-- **ebpf-loader**: Privileged container with eBPF tools
-- **sender**: Container that sends packets
-- **receiver1-3**: Containers that receive duplicated packets
+- **ebpf-loader**: Privileged container with eBPF tools (host network mode)
+- **sender**: Container that sends packets (on `sender_net`)
+- **receiver1-3**: Containers that receive duplicated packets (on `receiver_net`)
 
-All containers connected via custom bridge network `ebpf_net`.
+Sender and receivers are on separate networks to demonstrate cross-network packet duplication.
 
 ## Data Flow
 
@@ -150,16 +150,26 @@ long bpf_clone_redirect(struct __sk_buff *skb, u32 ifindex, u64 flags)
 
 ```
 Docker Host
-├── ebpf_net bridge (172.25.0.0/16)
+├── sender_net bridge (172.25.0.0/24)
 │   ├── veth_sender (host side) ◄── TC egress hook with eBPF
 │   │   └── eth0 (sender container, 172.25.0.x)
+│
+├── receiver_net bridge (172.26.0.0/24)
 │   ├── veth_receiver1 (host side) ◄── Receives cloned packets
-│   │   └── eth0 (receiver1 container, 172.25.0.y)
+│   │   └── eth0 (receiver1 container, 172.26.0.y)
 │   ├── veth_receiver2 (host side) ◄── Receives cloned packets
-│   │   └── eth0 (receiver2 container, 172.25.0.z)
+│   │   └── eth0 (receiver2 container, 172.26.0.z)
 │   └── veth_receiver3 (host side) ◄── Receives cloned packets
-│       └── eth0 (receiver3 container, 172.25.0.w)
+│       └── eth0 (receiver3 container, 172.26.0.w)
 ```
+
+**Cross-Network Duplication:**
+The eBPF program demonstrates packet duplication across network boundaries:
+- Sender is isolated on `sender_net` (172.25.0.0/24)
+- Receivers are isolated on `receiver_net` (172.26.0.0/24)
+- eBPF loader (in host network mode) bridges both networks
+- Packets leaving the sender are intercepted and cloned to receivers in a different network
+- This validates that `bpf_clone_redirect()` works across network namespaces
 
 ## Security Considerations
 
